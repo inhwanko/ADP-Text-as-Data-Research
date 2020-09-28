@@ -5,9 +5,9 @@ date: 'Sep 27, 2020'
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 
-rm(list=ls())
+# rm(list=ls())
 
 setwd("C:/Users/inhwa/OneDrive - UW/Research/2020/ADP/2nd_analysis")
 
@@ -18,7 +18,9 @@ library(tidytext)
 library(quanteda)
 
 source("wordfish_1.3.r")
+
 ```
+
 
 # 1. Data import and inspection
 
@@ -41,12 +43,12 @@ nrow(wordcount)
 # 2. Wordfish 
 
 ```{r}
-dtm <- create_matrix(adp$text, language="english",
-                     removeNumbers=T, stemWords=T, 
+wordfish_dtm <- create_matrix(adp$text, language="english",
+                     removeNumbers=T, stemWords=TRUE, 
                      removePunctuation=T, removeStopwords=T,
                      toLower=T, stripWhitespace=T)
 
-tdm <- as.TermDocumentMatrix(dtm) %>% 
+tdm <- as.TermDocumentMatrix(wordfish_dtm) %>% 
   as.matrix()
 
 wf <- wordfish(tdm, dir=c(118,115)) 
@@ -122,6 +124,70 @@ ggplot(groups_score_df, aes(time, meanscore, group=group, color=group)) +
 
 
 
+```
+
+
+# 3. STM
+
+## 1. Prep the STM
+
+```{r}
+library(stm)
+
+colnames(adp)
+
+stm_adp <- adp %>% 
+  select(doc_id, text, session, part, time, date, year, group, score)
+
+pre_stm_adp <- textProcessor(stm_adp$text, metadata=stm_adp)
+dtm_stm_adp <- prepDocuments(pre_stm_adp$documents, pre_stm_adp$vocab,
+                             pre_stm_adp$meta, lower.thresh = 0)
+```
+
+## 2. Find the optimized number for topics
+
+```{r echo=T, results='hide'}
+set.seed(2020)
+k=c(3:20, 25, 30, 40, 50, 100)
+
+dtm <- dtm_stm_adp
+
+optimize_k <- searchK(dtm$documents, dtm$vocab, k, data=dtm$meta)
+```
+
+```{r}
+plot(optimize_k)
+
+```
+
+## 3. Run the STM
+
+```{r}
+K <- 10
+stm <- stm(dtm$documents, dtm$vocab, K,
+           data=dtm$meta,
+           seed=2020, init.type="Spectral")
+
+labelTopics(stm, topics=1:K)
+
+stm_corr <- topicCorr(stm)
+
+stm_dt <- make.dt(stm, meta=dtm$meta) 
+write.csv(stm_dt, "stm_dt.csv")
+
+summary(lm(Topic2 ~ score.omega, stm_dt))
+summary(lm(Topic9 ~ score.omega, stm_dt))
+
+```
+
+```{r}
+stm_withscore <- stm(dtm$documents, dtm$vocab, K,
+           data=dtm$meta, prevalence=~score,
+           seed=2020, init.type="Spectral")
+
+stm_withscore_corr <- topicCorr(stm_withscore)
+
+result <- estimateEffect(c(2) ~ score, stm_withscore, stm_adp)
 ```
 
 
