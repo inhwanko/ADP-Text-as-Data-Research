@@ -1,0 +1,130 @@
+---
+title: "ADP_wordfish"
+author: "Inhwan Ko"
+date: 'Sep 27, 2020'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+rm(list=ls())
+
+setwd("C:/Users/inhwa/OneDrive - UW/Research/2020/ADP/2nd_analysis")
+
+library(RTextTools)
+library(tm)
+library(tidyverse)
+library(tidytext)
+library(quanteda)
+
+source("wordfish_1.3.r")
+```
+
+# 1. Data import and inspection
+
+```{r}
+library(readxl)
+adp <- read_excel("adp_0927.xlsx")
+
+length(unique(adp$group)) # 16 negotiation blocs
+ 
+wordcount <- adp %>% 
+  unnest_tokens(word, text) %>% # try different ones like bigrams and trigrams 
+  anti_join(stop_words) %>% 
+  count(word, sort=T)
+
+wordcount
+nrow(wordcount)
+
+```
+
+# 2. Wordfish 
+
+```{r}
+dtm <- create_matrix(adp$text, language="english",
+                     removeNumbers=T, stemWords=T, 
+                     removePunctuation=T, removeStopwords=T,
+                     toLower=T, stripWhitespace=T)
+
+tdm <- as.TermDocumentMatrix(dtm) %>% 
+  as.matrix()
+
+wf <- wordfish(tdm, dir=c(118,115)) 
+
+adp$score <- NA
+adp$score <- wf$documents
+
+write.csv(adp, "adp_with_scores.csv")
+
+write.csv(wf$words, "wordweight.csv")
+```
+
+```{r}
+bloc <- unique(adp$group)
+
+score <- NA
+for (i in 1:length(bloc)) {
+  score[i] <- mean(adp$score[adp$group==bloc[i]])
+}
+
+score_result <- as.data.frame(cbind(bloc, score))
+colnames(score_result) <- c("group","score")
+score_result$score <- as.numeric(as.character(score_result$score))
+
+score_result <- score_result %>% 
+  arrange(desc(score))
+
+write.csv(score_result, "score_result.csv")
+
+
+```
+
+Now, plotting the score results.  
+
+```{r}
+library(ggplot2)
+
+ggplot(score_result, aes(reorder(group, -score), score)) +
+  geom_point(aes(color=group), show.legend=F) +
+  coord_flip() +
+  geom_hline(yintercept=0, color="red") +
+  ggtitle("Mean score of Negotiation Blocs") +
+  xlab("Negotiation Blocs") +
+  ylab("Mean Score")
+  
+```
+Time-series of positional changes?
+
+```{r}
+groups_score <- list(NULL)
+for (i in 1:length(bloc)) {
+  groups_score[[i]] <- adp %>% 
+    filter(group==bloc[i]) %>% 
+    select(group,time,score) %>% 
+    group_by(time) %>% 
+    summarise(meanscore = mean(score))
+  groups_score[[i]]$group <- NA
+  groups_score[[i]]$group <- bloc[i]
+}
+
+groups_score_df <- data.frame(time=NA, meanscore=NA, group=NA)
+for (i in 1:length(bloc)) {
+  groups_score_df <- rbind(groups_score_df, groups_score[[i]])
+}
+groups_score_df <- na.omit(groups_score_df) 
+
+library(directlabels)
+ggplot(groups_score_df, aes(time, meanscore, group=group, color=group)) +
+  geom_line() +
+  geom_point(alpha=0.3) +
+  scale_x_continuous(breaks=c(1:12)) +
+  geom_dl(aes(label = group), method = list(dl.combine("last.points")), cex = 0.3) 
+
+
+
+```
+
+
+
+
+
