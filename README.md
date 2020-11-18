@@ -15,3 +15,7 @@ Negotiators in the making of the Paris Agreement had to face several challenges 
 We contribute to the understanding of the new political landscape for climate change negotiation by covering more negotiation blocs than previous literature has covered. Also, questioning the validity and usefulness of automated text analysis methods, we offer a new approach which can help us better understand positional differences among negotiation blocs with large textual data. This approach can be further expanded to analyze not only negotiation blocs’ but country Parties’ statements to ask compelling questions such as under what conditions country Parties’ positions deviate from their affiliated negotiation blocs. It can also be expanded to treaty negotiation cases in various issue-areas such as environment or human rights. Finally, by publicly providing our codes and results, our analysis serves as a basis for tools that help policymakers and analysts efficiently detect and keep track of positions of different political actors after the Paris Agreement was signed in 2015.   
 
 Keywords: climate change negotiation, UNFCCC, negotiation bloc, North-South, CBDR-RC, ADP, text-as-data, automated text analysis, wordfish
+
+![alt text](https://github.com/inhwanko/ADP-Text-as-Data-Research/blob/master/score_groups.JPG)  
+
+![alt text](https://github.com/inhwanko/ADP-Text-as-Data-Research/blob/master/score_time.JPG)  
