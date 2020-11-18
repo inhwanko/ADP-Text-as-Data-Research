@@ -22,7 +22,7 @@ Keywords: climate change negotiation, UNFCCC, negotiation bloc, North-South, CBD
 
 ![alt text](https://github.com/inhwanko/ADP-Text-as-Data-Research/blob/master/score_groups.JPG)  
 
-### Figure 2. Time-Series Variation of Positions by Country Groups, ADP 2-1 to 2-12, with 95% Confidence Intervals
+### Figure 2. Time-Series Variation of Positions by Country Groups, ADP 2-1 to 2-12, with 95% Confidence Intervals (by Bootstrap)
 
 ![alt text](https://github.com/inhwanko/ADP-Text-as-Data-Research/blob/master/score_time.JPG)    
 
