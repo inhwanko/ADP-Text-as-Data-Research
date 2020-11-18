@@ -16,6 +16,12 @@ We contribute to the understanding of the new political landscape for climate ch
 
 Keywords: climate change negotiation, UNFCCC, negotiation bloc, North-South, CBDR-RC, ADP, text-as-data, automated text analysis, wordfish
 
+## Key Preliminary Findings
+
+### Figure 1. Point Estimates of Positions estimated from Country Bloc ADP Statements
+
 ![alt text](https://github.com/inhwanko/ADP-Text-as-Data-Research/blob/master/score_groups.JPG)  
+
+### Figure 2. Time-Series Variation of Positions by Country Groups, ADP 2-1 to 2-12
 
 ![alt text](https://github.com/inhwanko/ADP-Text-as-Data-Research/blob/master/score_time.JPG)  
